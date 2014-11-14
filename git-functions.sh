@@ -163,6 +163,7 @@ function git-add-branch () {
 		git config "branch.$branchName.parent" "$parentBranch"
 	else
 		echo " usage: git-new-branch <branch-name>"
+		echo " usage: gab <branch-name>"
 	fi
 }
 alias gab='git-add-branch'
@@ -232,21 +233,26 @@ function git-del-branch () {
 	else
 		echo;
         echo "usage: git-del-branch <branch-name>"
+        echo "usage: gdb <branch-name>"
 	fi
 }
 alias gdb='git-del-branch'
 
-
 ##
+# There are use cases where you'll be changing versioned files but you never
+# want them committed. This allows you to easily add, remove, or list files 
+# with the assume-unchanged flag.
+# 
 # - mark versioned files as 'assume-unchanged'
-# - remove the 'assume-unchanged'
+# - remove the 'assume-unchanged' flag from a file
 # - list files marked as 'assume-unchanged'
-function gun () {
+function git-assume-unchanged () {
     function gunUsage () {
         echo;
+        echo " usage: git-assume-unchanged [-l] [-h] [-r <file>] [-a <file>]"
         echo " usage: gun [-l] [-h] [-r <file>] [-a <file>]"
         echo;
-        echo " h  Shows usage and examples for gun"
+        echo " h  Shows usage and examples"
         echo " l  List all files marked as assume-unchanged"
         echo " a  Add the assume-unchanged flag to a file"
         echo " r  Remove the assume-unchanged flag from a file"
@@ -294,3 +300,4 @@ function gun () {
         gunUsage
     fi
 }
+alias gun='git-assume-unchanged'
