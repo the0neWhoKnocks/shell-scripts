@@ -67,9 +67,10 @@ function git-changes (){
         # the status of the file. status is a reserved var
         local stat=$(echo "$line" | egrep -io '^(\w)')
         # the file name
-        file=$(echo ${line##*/})
+        file=$(echo `basename "${line}"`)
         # the file path
         fp=$(dirname "$line") && fp=$(echo "${fp#* }")
+
 
         if [[ "$fp" != "" && "$fp" != "." ]]; then
             fp=" ${gray}($fp)${reset} \n\n"
