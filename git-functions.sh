@@ -302,3 +302,18 @@ function git-assume-unchanged () {
     fi
 }
 alias gun='git-assume-unchanged'
+
+##
+# A shorthand function to create patches of changes in your current branch
+function git-patch () {
+	if [[ "$1" != "" ]]; then
+		git diff > "$1.patch"
+	else
+		echo;
+        echo "usage: git-patch <patch-name>  OR  gp <patch-name>"
+        echo;
+        echo "example: gp my-name"
+        echo "example: gp \"../Some folder/my-name\""
+	fi
+}
+alias gp='git-patch'
