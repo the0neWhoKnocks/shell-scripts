@@ -171,7 +171,7 @@ alias gab='git-add-branch'
 
 ##
 # Deletes a user defined git branch locally and removes it from remote
-function git-del-branch () {
+function git-delete-branch () {
     if [[ "$1" != "" ]]; then
 		local currBranch parentBranch thereAreChanges okToProceed
 
@@ -233,11 +233,11 @@ function git-del-branch () {
         
 	else
 		echo;
-        echo "usage: git-del-branch <branch-name>"
+        echo "usage: git-delete-branch <branch-name>"
         echo "usage: gdb <branch-name>"
 	fi
 }
-alias gdb='git-del-branch'
+alias gdb='git-delete-branch'
 
 ##
 # There are use cases where you'll be changing versioned files but you never
@@ -317,3 +317,23 @@ function git-patch () {
 	fi
 }
 alias gp='git-patch'
+
+##
+# A shorthand function to rename a local and remote branch
+function git-rename-branch () {
+    if [[ "$1" != "" && "$2" != "" ]]; then
+        # Rename branch locally
+        git branch -m "$1" "$2"
+        # Delete the old branch
+        git push origin :"$1"
+        # Push the new branch, set local branch to track the new remote
+        git push --set-upstream origin "$2"
+    else
+        echo;
+        echo "usage: git-rename-branch <old-branch-name> <new-branch-name>"
+        echo "       grb <old-branch-name> <new-branch-name>"
+        echo;
+        echo "example: grb tst-branch test-branch"
+    fi    
+}
+alias grb='git-rename-branch'
