@@ -163,7 +163,7 @@ function git-add-branch () {
         echo " [SETTING] a reference to the parent '$parentBranch'"
 		git config "branch.$branchName.parent" "$parentBranch"
 	else
-		echo " usage: git-new-branch <branch-name>"
+		echo " usage: git-add-branch <branch-name>"
 		echo " usage: gab <branch-name>"
 	fi
 }
