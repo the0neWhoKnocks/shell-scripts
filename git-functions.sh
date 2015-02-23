@@ -334,6 +334,29 @@ function git-rename-branch () {
         echo "       grb <old-branch-name> <new-branch-name>"
         echo;
         echo "example: grb tst-branch test-branch"
-    fi    
+    fi
 }
 alias grb='git-rename-branch'
+
+##
+# Stop tracking a file or directory that was previously committed
+function git-untrack () {
+	if [[ "$1" != "" ]]; then
+        git rm -r --cached "$1"
+    else
+        echo;
+        echo "usage: git-untrack <folder-or-file>"
+        echo "       gut <folder-or-file>"
+        echo;
+        echo "example: gut path/to/file.txt"
+        echo "example: gut path/to/folder/"
+    fi
+}
+alias gut='git-untrack'
+
+##
+# View all files staged to be committed
+function git-view-staged () {
+	git diff --name-only --cached
+}
+alias gvs='git-view-staged'
