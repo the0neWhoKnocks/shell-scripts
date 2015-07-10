@@ -21,7 +21,7 @@ gitProjectRoot="master"
 ##
 # Updates current git branch
 function git-update () {
-	local currBranch=$(git rev-parse --abbrev-ref HEAD)
+    local currBranch=$(git rev-parse --abbrev-ref HEAD)
     local parentBranch=$(git config "branch.$currBranch.parent")
     thereAreChanges=$(echo -ne $(git diff --exit-code))
 
@@ -32,8 +32,8 @@ function git-update () {
     fi
 
     if [[ "$1" != "" && "$2" != "" ]]; then
-		git pull --rebase $1 $2
-	else
+        git pull --rebase $1 $2
+    else
         # only try to rebase if there's a parent branch
         if [[ "$parentBranch" != "" ]]; then
             echo;
@@ -44,7 +44,7 @@ function git-update () {
             echo " [PULLING] new changes"
             git pull
         fi
-	fi
+    fi
 
     if [[ "$thereAreChanges" != "" ]]; then
         echo;
@@ -120,7 +120,7 @@ function git-add-branch () {
     local branchName="$1"
 
     if [[ "$branchName" != "" ]]; then
-		# verify the branch name adheres to the branching model
+        # verify the branch name adheres to the branching model
         if [[ "$branchName" != *\/* ]]; then
             echo;
             echo " [ERROR] name: \"$branchName\" doesn't match our current branching model."
@@ -153,26 +153,26 @@ function git-add-branch () {
                 ;;
             esac
         fi
-		
-		local parentBranch=$(git rev-parse --abbrev-ref HEAD)
+        
+        local parentBranch=$(git rev-parse --abbrev-ref HEAD)
 
         echo;
         echo " [CREATING] branch: $branchName"
-		git checkout -b $branchName
-		
-		echo;
-		echo " [ADDING] '$branchName' to your remote origin"
-		git push -u origin $branchName
-		
-		echo;
-		echo " [SETTING] the remote for '$branchName' to origin"
+        git checkout -b $branchName
+        
+        echo;
+        echo " [ADDING] '$branchName' to your remote origin"
+        git push -u origin $branchName
+        
+        echo;
+        echo " [SETTING] the remote for '$branchName' to origin"
         git config "branch.$branchName.remote" "origin"
         echo " [SETTING] a reference to the parent '$parentBranch'"
-		git config "branch.$branchName.parent" "$parentBranch"
-	else
-		echo " usage: git-add-branch <branch-name>"
-		echo " usage: gab <branch-name>"
-	fi
+        git config "branch.$branchName.parent" "$parentBranch"
+    else
+        echo " usage: git-add-branch <branch-name>"
+        echo " usage: gab <branch-name>"
+    fi
 }
 alias gab='git-add-branch'
 
@@ -180,69 +180,69 @@ alias gab='git-add-branch'
 # Deletes a user defined git branch locally and removes it from remote
 function git-delete-branch () {
     if [[ "$1" != "" ]]; then
-		local currBranch parentBranch thereAreChanges okToProceed
+        local currBranch parentBranch thereAreChanges okToProceed
 
-		currBranch=$(git rev-parse --abbrev-ref HEAD)
-		parentBranch=$(git config "branch.$currBranch.parent")
-		thereAreChanges=$(echo -ne $(git diff --exit-code))
-		okToProceed=1
+        currBranch=$(git rev-parse --abbrev-ref HEAD)
+        parentBranch=$(git config "branch.$currBranch.parent")
+        thereAreChanges=$(echo -ne $(git diff --exit-code))
+        okToProceed=1
 
-		# if there isn't a parent branch, use the root branch
-		if [[ "$parentBranch" == "" ]]; then
-			echo;
-			echo " [SETTING] parentBranch to $gitProjectRoot"
-			parentBranch=$gitProjectRoot
-		fi
+        # if there isn't a parent branch, use the root branch
+        if [[ "$parentBranch" == "" ]]; then
+            echo;
+            echo " [SETTING] parentBranch to $gitProjectRoot"
+            parentBranch=$gitProjectRoot
+        fi
 
-		# if there are changes stash them
-		if [[ "$thereAreChanges" != "" ]]; then
-			echo;
-			echo " [STASH] changes"
-			git stash
-		fi
-		
+        # if there are changes stash them
+        if [[ "$thereAreChanges" != "" ]]; then
+            echo;
+            echo " [STASH] changes"
+            git stash
+        fi
+        
         if [[ "$currBranch" == "$1" ]]; then
             # check if the branch exists before switching
-			git show-ref --verify --quiet refs/heads/$parentBranch
-			if [[ "$?" == "1" ]]; then
-				echo;
-				echo " [ERROR] The branch assigned to parentBranch:$parentBranch doesn't exist locally."
-				
-				if [[ "$thereAreChanges" != "" ]]; then
-					echo " [UN-STASH] changes"
-					git stash pop
-				fi
-				
-				okToProceed=0
-			else
-	            echo;
-	            echo " You're trying to delete a branch you're currently in."
-	            echo " [SWITCHING] to '$parentBranch' branch for now so '$1' can be deleted."
-	            git checkout $parentBranch
-			fi
+            git show-ref --verify --quiet refs/heads/$parentBranch
+            if [[ "$?" == "1" ]]; then
+                echo;
+                echo " [ERROR] The branch assigned to parentBranch:$parentBranch doesn't exist locally."
+                
+                if [[ "$thereAreChanges" != "" ]]; then
+                    echo " [UN-STASH] changes"
+                    git stash pop
+                fi
+                
+                okToProceed=0
+            else
+                echo;
+                echo " You're trying to delete a branch you're currently in."
+                echo " [SWITCHING] to '$parentBranch' branch for now so '$1' can be deleted."
+                git checkout $parentBranch
+            fi
         fi
-		
-		if [ $okToProceed -eq 1 ]; then
-			echo;
-	        echo " [DELETING] '$1' from remote origin"
-			git push origin --delete $1
-			
-			echo;
-			echo " [DELETING] '$1' from your local repo"
-			git branch -D $1
-			
-			if [[ "$thereAreChanges" != "" ]]; then
-				echo;
-				echo " [UN-STASH] changes"
-				git stash pop
-			fi
-		fi
         
-	else
-		echo;
+        if [ $okToProceed -eq 1 ]; then
+            echo;
+            echo " [DELETING] '$1' from remote origin"
+            git push origin --delete $1
+            
+            echo;
+            echo " [DELETING] '$1' from your local repo"
+            git branch -D $1
+            
+            if [[ "$thereAreChanges" != "" ]]; then
+                echo;
+                echo " [UN-STASH] changes"
+                git stash pop
+            fi
+        fi
+        
+    else
+        echo;
         echo "usage: git-delete-branch <branch-name>"
         echo "usage: gdb <branch-name>"
-	fi
+    fi
 }
 alias gdb='git-delete-branch'
 
@@ -313,15 +313,15 @@ alias gun='git-assume-unchanged'
 ##
 # A shorthand function to create patches of changes in your current branch
 function git-patch () {
-	if [[ "$1" != "" ]]; then
-		git diff > "$1.patch"
-	else
-		echo;
+    if [[ "$1" != "" ]]; then
+        git diff > "$1.patch"
+    else
+        echo;
         echo "usage: git-patch <patch-name>  OR  gp <patch-name>"
         echo;
         echo "example: gp my-name"
         echo "example: gp \"../Some folder/my-name\""
-	fi
+    fi
 }
 alias gp='git-patch'
 
@@ -348,7 +348,7 @@ alias grb='git-rename-branch'
 ##
 # Stop tracking a file or directory that was previously committed
 function git-untrack () {
-	if [[ "$1" != "" ]]; then
+    if [[ "$1" != "" ]]; then
         git rm -r --cached "$1"
     else
         echo;
@@ -364,6 +364,6 @@ alias gut='git-untrack'
 ##
 # View all files staged to be committed
 function git-view-staged () {
-	git diff --name-only --cached
+    git diff --name-only --cached
 }
 alias gvs='git-view-staged'
