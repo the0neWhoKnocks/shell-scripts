@@ -34,9 +34,16 @@ function git-update () {
     if [[ "$1" != "" && "$2" != "" ]]; then
 		git pull --rebase $1 $2
 	else
-        echo;
-        echo " [PULLING] from parent \"$parentBranch\""
-        git pull --rebase origin "$parentBranch"
+        # only try to rebase if there's a parent branch
+        if [[ "$parentBranch" != "" ]]; then
+            echo;
+            echo " [REBASING] from parent \"$parentBranch\""
+            git pull --rebase origin "$parentBranch"
+        else
+            echo;
+            echo " [PULLING] new changes"
+            git pull
+        fi
 	fi
 
     if [[ "$thereAreChanges" != "" ]]; then
