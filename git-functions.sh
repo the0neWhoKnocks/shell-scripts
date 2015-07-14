@@ -367,3 +367,85 @@ function git-view-staged () {
     git diff --name-only --cached
 }
 alias gvs='git-view-staged'
+
+##
+# Squash a specified number of commits into one commit
+function git-squash () {
+    if [[ "$1" != "" ]]; then
+        thereAreChanges=$(echo -ne $(git diff --exit-code))
+
+        if [[ "$thereAreChanges" != "" ]]; then
+            echo;
+            echo " [STASH] changes"
+            echo;
+            
+            git stash
+        fi
+
+        git rebase -i HEAD~$1
+
+        if [[ "$thereAreChanges" != "" ]]; then
+            echo;
+            echo " [UN-STASH] changes"
+            git stash pop
+        fi
+        
+        echo;
+        echo "If something went wrong during the squash, just run 'git-undo-squash' or 'gus'"
+        echo;
+    else
+        echo;
+        echo "usage: git-squash <number-of-revisions>"
+        echo "       gs <number-of-revisions>"
+        echo;
+        echo "example: gs 2"
+        echo;
+        echo "Do you want to view the logs?"
+        echo " Y / N"
+        echo;
+        
+        # capture the user's choice
+        echo -n ""
+        read selectedOption
+        
+        if [[ "$selectedOption" == "y" || "$selectedOption" == "Y" ]]; then
+            git log --stat --pretty=tformat:" %C(yellow)%h%C(reset) - %C(cyan)%aN%C(reset) : %s"
+        fi
+    fi
+}
+alias gs='git-squash'
+
+##
+# Squash a specified number of commits into one commit
+function git-undo-squash () {
+    echo;
+    echo "- Find the HEAD revision ( HEAD{<number>} ) from reflog"
+    echo "- Enter 'q' to exit the log"
+    echo;
+    echo "Do you want to view the reflog?"
+    echo " Y / N"
+    echo;
+    
+    # capture the user's choice
+    echo -n ""
+    read selectedOption
+    
+    if [[ "$selectedOption" == "y" || "$selectedOption" == "Y" ]]; then
+        git reflog
+        
+        echo;
+        echo "Enter in the HEAD revision number or type 'exit'"
+        echo;
+        
+        # capture the user's choice
+        echo -n ""
+        read revisionNumber
+        
+        if [[ "$revisionNumber" == "exit" ]]; then
+            exit 0;
+        else
+            git reset --hard HEAD@{$revisionNumber}
+        fi
+    fi
+}
+alias gus='git-undo-squash'
