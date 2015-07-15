@@ -301,3 +301,44 @@ function git-assume-unchanged () {
     fi
 }
 alias gun='git-assume-unchanged'
+
+##
+# Author: Dmitry White // white.dmitry@gmail.com
+# This script is a shortcut for 'git rebase-i HEAD~n' where n is the number of commits
+# back in the tree you want to squash.  This script accepts one optional argument, the
+# number of commits before HEAD that you want to squash.  If it receives no arguments,
+# it tries to find the most recent merge commit in the tree and assumes you want to squash
+# back to there.
+function git-rebase-interactive () {
+  declare -i currentRef
+  if [[ "$1" == "" ]]; then
+    local lastMerge foundMerge currentSha
+    currentRef=0
+    foundMerge=0
+
+    while [[ $foundMerge -eq 0 ]]; do
+        currentSha=$(git rev-parse --short HEAD~$currentRef)
+        if [[ $currentSha == "" ]]; then
+            echo "itsOK: No merge commits detected in tree; assuming rebase last 2 commits."
+            currentRef=2
+            break
+        fi
+        lastMerge=$(git rev-list --parents -n 1 $currentSha)
+        IFS=' ' read -a parentsArray <<< "$lastMerge"
+        if [[ ${parentsArray[2]} != "" ]]; then
+            foundMerge=1
+        else
+            currentRef=$currentRef+1
+        fi
+    done
+  else
+    currentRef=$1
+  fi
+
+  if [[ $currentRef -eq 0 ]]; then
+    echo "HEAD is currently at the most recent merge commit.  Aborting."
+  else
+    git rebase -i HEAD~$currentRef
+  fi
+}
+alias grbi='git-rebase-interactive'
