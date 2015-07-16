@@ -409,7 +409,7 @@ function git-squash () {
         read selectedOption
         
         if [[ "$selectedOption" == "y" || "$selectedOption" == "Y" ]]; then
-            git log --stat --pretty=tformat:" %C(yellow)%h%C(reset) - %C(cyan)%aN%C(reset) : %s"
+            git log --stat --pretty=format:" %C(yellow)%h%C(reset) - %C(cyan)%aN%C(reset) : %s"
         fi
     fi
 }
