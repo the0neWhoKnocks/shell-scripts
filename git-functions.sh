@@ -225,7 +225,7 @@ function git-delete-branch () {
         if [ $okToProceed -eq 1 ]; then
             echo;
             echo " [DELETING] '$1' from remote origin"
-            git push origin --delete $1
+            git push origin --delete --no-verify $1
             
             echo;
             echo " [DELETING] '$1' from your local repo"
