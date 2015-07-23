@@ -18,6 +18,24 @@
 # this branch, allowing the previous branch to be deleted.
 gitProjectRoot="master"
 
+
+# Text Reset
+EscChar=$(printf '\033')
+EscChar="${EscChar}["
+RCol="${EscChar}0m"
+BoldCol="${EscChar}1m"
+
+# Regular                Bold                        Background                 Bold Backgrounds
+Bla="${EscChar}30m";     BBla="${BoldCol}${Bla}";    On_Bla="${EscChar}40m";    On_IBla="${EscChar}100m";
+Red="${EscChar}31m";     BRed="${BoldCol}${Red}";    On_Red="${EscChar}41m";    On_IRed="${EscChar}101m";
+Gre="${EscChar}32m";     BGre="${BoldCol}${Gre}";    On_Gre="${EscChar}42m";    On_IGre="${EscChar}102m";
+Yel="${EscChar}33m";     BYel="${BoldCol}${Yel}";    On_Yel="${EscChar}43m";    On_IYel="${EscChar}103m";
+Blu="${EscChar}34m";     BBlu="${BoldCol}${Blu}";    On_Blu="${EscChar}44m";    On_IBlu="${EscChar}104m";
+Pur="${EscChar}35m";     BPur="${BoldCol}${Pur}";    On_Pur="${EscChar}45m";    On_IPur="${EscChar}105m";
+Cya="${EscChar}36m";     BCya="${BoldCol}${Cya}";    On_Cya="${EscChar}46m";    On_ICya="${EscChar}106m";
+Whi="${EscChar}37m";     BWhi="${BoldCol}${Whi}";    On_Whi="${EscChar}47m";    On_IWhi="${EscChar}107m";
+
+
 ##
 # Updates current git branch
 function git-update () {
@@ -27,28 +45,33 @@ function git-update () {
 
     if [[ "$thereAreChanges" != "" ]]; then
         echo;
-        echo " [STASH] changes"
+        echo -e " ${BCya}[STASH]${RCol} changes"
         git stash
     fi
 
     if [[ "$1" != "" && "$2" != "" ]]; then
+        echo;
+        echo -e " ${BCya}[REBASING]${RCol} from \"$1\" to \"$2\""
+        echo;
         git pull --rebase $1 $2
     else
         # only try to rebase if there's a parent branch
         if [[ "$parentBranch" != "" ]]; then
             echo;
-            echo " [REBASING] from parent \"$parentBranch\""
+            echo -e " ${BCya}[REBASING]${RCol} from parent \"$parentBranch\""
+            echo;
             git pull --rebase origin "$parentBranch"
         else
             echo;
-            echo " [PULLING] new changes"
+            echo -e " ${BCya}[PULLING]${RCol} new changes"
+            echo;
             git pull
         fi
     fi
 
     if [[ "$thereAreChanges" != "" ]]; then
         echo;
-        echo " [UN-STASH] changes"
+        echo -e " ${BCya}[UN-STASH]${RCol} changes"
         git stash pop
     fi
 }
@@ -57,13 +80,6 @@ alias gu='git-update'
 ##
 # Displays a list of modified files and their location path
 function git-changes (){
-    local esc=$(printf '\033')
-    local bold="${esc}[1m"
-    local reset="${esc}[0m"
-    local red="${bold}${esc}[31m"
-    local darkRed="${esc}[31m"
-    local cyan="${esc}[36m"
-    local gray="${bold}${esc}[30m"
     local changeCount=0
     local modifiedFiles=""
     local modifiedCount=0
@@ -80,7 +96,7 @@ function git-changes (){
 
 
         if [[ "$fp" != "" && "$fp" != "." ]]; then
-            fp=" ${gray}($fp)${reset} \n\n"
+            fp=" ${BBla}($fp)${RCol} \n\n"
         else
             file=$(echo ${line#* }) # fix root level filenames
             fp="\n\n"
@@ -89,10 +105,10 @@ function git-changes (){
         # if the status is set, add a space and proper coloring
         if [ "$stat" != "" ]; then
             # ${red}$stat${reset} 
-            modifiedFiles=$(echo "$modifiedFiles${cyan}$file$fp ${gray}")
+            modifiedFiles=$(echo -e "$modifiedFiles${Cya}$file$fp ${BBla}")
             modifiedCount=$((modifiedCount+1))
         elif [ "$file" != "" ]; then
-            untrackedFiles=$(echo "$untrackedFiles${reset}${darkRed}$file$fp ")
+            untrackedFiles=$(echo -e "$untrackedFiles${reset}${Red}$file$fp ")
             untrackedCount=$((untrackedCount+1))
         fi
 
@@ -103,13 +119,13 @@ function git-changes (){
     done < <(git status -s)
     
     echo -e "\n\n";
-    echo -e "${gray}████████████████████████████████████████████"
-    echo -e "\n Modified Files ${reset}($modifiedCount)${gray} \n"
+    echo -e "${BBla}████████████████████████████████████████████"
+    echo -e "\n Modified Files ${RCol}($modifiedCount)${BBla} \n"
     echo -e " $modifiedFiles"
     echo -e "------------------------------------------- \n"
-    echo -e " Untracked Files ${reset}($untrackedCount)${gray} \n"
+    echo -e " Untracked Files ${RCol}($untrackedCount)${BBla} \n"
     echo -e " $untrackedFiles"
-    echo -e "\n                         ${gray}Files Changed ${reset}($changeCount)${gray}"
+    echo -e "\n                         ${BBla}Files Changed ${RCol}($changeCount)${BBla}"
     echo -e "████████████████████████████████████████████ \n\n"
 }
 alias gc='git-changes'
@@ -123,15 +139,15 @@ function git-add-branch () {
         # verify the branch name adheres to the branching model
         if [[ "$branchName" != *\/* ]]; then
             echo;
-            echo " [ERROR] name: \"$branchName\" doesn't match our current branching model."
+            echo -e " ${BRed}[ERROR]${RCol} The name ${BYel}$branchName${RCol} doesn't match our current branching model."
             echo;
             echo " Select one of the scheming prefixes below."
             echo;
-            echo " (1) bugfix/"
-            echo " (2) feature/"
-            echo " (3) hotfix/"
-            echo " (4) release/"
-            echo " (5) I don't want to follow the branching model "
+            echo " ${BYel}(1)${RCol} bugfix/"
+            echo " ${BYel}(2)${RCol} feature/"
+            echo " ${BYel}(3)${RCol} hotfix/"
+            echo " ${BYel}(4)${RCol} release/"
+            echo " ${BYel}(5)${RCol} I don't want to follow the branching model "
             echo;
 
             # capture the user's choice
@@ -157,17 +173,17 @@ function git-add-branch () {
         local parentBranch=$(git rev-parse --abbrev-ref HEAD)
 
         echo;
-        echo " [CREATING] branch: $branchName"
+        echo -e " ${BCya}[CREATING]${RCol} local branch ${BYel}$branchName${RCol}"
         git checkout -b $branchName
         
         echo;
-        echo " [ADDING] '$branchName' to your remote origin"
+        echo -e " ${BCya}[ADDING]${RCol} ${BYel}$branchName${RCol} to your remote origin"
         git push -u origin $branchName
         
         echo;
-        echo " [SETTING] the remote for '$branchName' to origin"
+        echo -e " ${BCya}[SETTING]${RCol} the remote for ${BYel}$branchName${RCol} to origin"
         git config "branch.$branchName.remote" "origin"
-        echo " [SETTING] a reference to the parent '$parentBranch'"
+        echo -e " ${BCya}[SETTING]${RCol} a reference to the parent ${BYel}$parentBranch${RCol}"
         git config "branch.$branchName.parent" "$parentBranch"
     else
         echo " usage: git-add-branch <branch-name>"
@@ -190,14 +206,14 @@ function git-delete-branch () {
         # if there isn't a parent branch, use the root branch
         if [[ "$parentBranch" == "" ]]; then
             echo;
-            echo " [SETTING] parentBranch to $gitProjectRoot"
+            echo -e " ${BCya}[SETTING]${RCol} parentBranch to ${BYel}$gitProjectRoot${RCol}"
             parentBranch=$gitProjectRoot
         fi
 
         # if there are changes stash them
         if [[ "$thereAreChanges" != "" ]]; then
             echo;
-            echo " [STASH] changes"
+            echo -e " ${BCya}[STASH]${RCol} changes"
             git stash
         fi
         
@@ -206,34 +222,35 @@ function git-delete-branch () {
             git show-ref --verify --quiet refs/heads/$parentBranch
             if [[ "$?" == "1" ]]; then
                 echo;
-                echo " [ERROR] The branch assigned to parentBranch:$parentBranch doesn't exist locally."
+                echo -e " ${BRed}[ERROR]${RCol} The branch assigned to parentBranch:${BYel}$parentBranch${RCol} doesn't exist locally."
                 
                 if [[ "$thereAreChanges" != "" ]]; then
-                    echo " [UN-STASH] changes"
+                    echo -e " ${BCya}[UN-STASH]${RCol} changes"
                     git stash pop
                 fi
                 
                 okToProceed=0
             else
                 echo;
-                echo " You're trying to delete a branch you're currently in."
-                echo " [SWITCHING] to '$parentBranch' branch for now so '$1' can be deleted."
+                echo -e " ${BRed}[ERROR]${RCol} You're trying to delete a branch you're currently in."
+                echo;
+                echo -e " ${BCya}[SWITCHING]${RCol} to ${BYel}$parentBranch${RCol} branch for now so ${BYel}$1${RCol} can be deleted."
                 git checkout $parentBranch
             fi
         fi
         
         if [ $okToProceed -eq 1 ]; then
             echo;
-            echo " [DELETING] '$1' from remote origin"
+            echo -e " ${BCya}[DELETING]${RCol} ${BYel}$1${RCol} from remote origin"
             git push origin --delete $1
             
             echo;
-            echo " [DELETING] '$1' from your local repo"
+            echo -e " ${BCya}[DELETING]${RCol} ${BYel}$1${RCol} from your local repo"
             git branch -D $1
             
             if [[ "$thereAreChanges" != "" ]]; then
                 echo;
-                echo " [UN-STASH] changes"
+                echo -e " ${BCya}[UN-STASH]${RCol} changes"
                 git stash pop
             fi
         fi
@@ -275,30 +292,30 @@ function git-assume-unchanged () {
             # list all files
             l)
                 echo;
-                echo "[ Files marked as assume-unchanged ]"
+                echo -e "${BGre}Files marked as assume-unchanged ${RCol}"
                 echo;
                 git ls-files -v | grep "^[[:lower:]]"
             ;;
             # will add the 'assume-unchanged' flag to a file
             a)
                 echo;
-                echo "[ADDING] 'assume-unchanged' flag to $OPTARG"
+                echo -e "${BCya}[ADDING]${RCol} 'assume-unchanged' flag to $OPTARG"
                 echo;
                 git update-index --assume-unchanged $OPTARG
             ;;
             # will remove the 'assume-unchanged' flag from a file
             r)
                 echo;
-                echo "[REMOVING] 'assume-unchanged' flag from $OPTARG"
+                echo -e "${BCya}[REMOVING]${RCol} 'assume-unchanged' flag from $OPTARG"
                 echo;
                 git update-index --no-assume-unchanged $OPTARG
             ;;
             \?)
-                echo "Invalid option: -$OPTARG" >&2
+                echo -e " ${BRed}[ERROR]${RCol} Invalid option: -$OPTARG" >&2
                 gunUsage
             ;;
             :)
-                echo "Option -$OPTARG requires an argument." >&2
+                echo -e " ${BRed}[ERROR]${RCol} Option -$OPTARG requires an argument." >&2
                 gunUsage
             ;;
         esac
@@ -376,7 +393,7 @@ function git-squash () {
 
         if [[ "$thereAreChanges" != "" ]]; then
             echo;
-            echo " [STASH] changes"
+            echo -e " ${BCya}[STASH]${RCol} changes"
             echo;
             
             git stash
@@ -386,7 +403,7 @@ function git-squash () {
 
         if [[ "$thereAreChanges" != "" ]]; then
             echo;
-            echo " [UN-STASH] changes"
+            echo -e " ${BCya}[UN-STASH]${RCol} changes"
             git stash pop
         fi
         
@@ -449,3 +466,73 @@ function git-undo-squash () {
     fi
 }
 alias gus='git-undo-squash'
+
+##
+# Displays the number of commits for all users or by a specified user
+function git-brag () {
+    local proceed=true
+    
+    function bragUsage () {
+        echo;
+        echo " usage: git-brag [-h] [-u <user_name>]"
+        echo " usage: gb [-h] [-u <user_name>]"
+        echo;
+        echo " h - Shows usage and examples"
+        echo " u - A user's name. This utilizes case insensitive Regular"
+        echo "     Expression so you could do something like"
+        echo "     \"First, Last|Last, First|first last\" to find all instances"
+        echo "     of a user."
+        echo;
+        proceed=false
+    }
+    
+    while getopts ":hu:" opt; do
+        case $opt in
+            h)
+                bragUsage
+            ;;
+            # A user name was supplied, store it and check later
+            u)
+                userName="$OPTARG"
+            ;;
+            \?)
+                echo;
+                echo -e " ${BRed}[ERROR]${RCol} Invalid option: -$OPTARG" >&2
+                bragUsage
+            ;;
+            :)
+                echo;
+                echo -e " ${BRed}[ERROR]${RCol} Option -$OPTARG requires an argument." >&2
+                bragUsage
+            ;;
+        esac
+    done
+    
+    if $proceed ; then
+        if [[ "$userName" != "" && "$userName" != "%n" ]]; then
+            local totalCommits=0
+            
+            echo;
+            
+            while read line; do
+                # This is pretty slow currently and should be refactored
+                local ptrnMatch=$(echo "$line" | grep -io "$userName")
+                
+                if [[ "$ptrnMatch" != "" ]]; then
+                    echo " ${BCya}[FOUND]${RCol} $line"
+                    local count=$(echo "$line" | grep -o "^[0-9]*");
+                    let "totalCommits += $count"
+                fi
+            done < <(git shortlog -s -n)
+            
+            echo;
+            echo " The user matching ${BYel}$userName${RCol} has ${BGre}$totalCommits${RCol} commits"
+            echo;
+        else
+            while read line; do
+                echo "$line"
+            done < <(git shortlog -s -n)
+        fi
+    fi
+}
+alias gb='git-brag'
