@@ -242,7 +242,7 @@ function git-delete-branch () {
         if [ $okToProceed -eq 1 ]; then
             echo;
             echo -e " ${BCya}[DELETING]${RCol} ${BYel}$1${RCol} from remote origin"
-            git push origin --delete $1
+            git push origin --delete --no-verify $1
             
             echo;
             echo -e " ${BCya}[DELETING]${RCol} ${BYel}$1${RCol} from your local repo"
