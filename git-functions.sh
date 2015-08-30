@@ -536,3 +536,24 @@ function git-brag () {
   fi
 }
 alias gb='git-brag'
+
+##
+# Removes an added file/folder from staged files
+function git-undo-add () {
+  if [[ "$1" != "" ]]; then
+    echo;
+    echo -e " ${BCya}[UN-STAGING]${RCol} ${BYel}$1${RCol}"
+    echo;
+    
+    git reset HEAD "$1"
+    
+  else
+    echo;
+    echo "usage: git-undo-add <file-or-folder-name>"
+    echo "       gua <file-or-folder-name>"
+    echo;
+    echo "example: gua \"some/path to/a/file.jpg\""
+    echo;
+  fi
+}
+alias gua='git-undo-add'
