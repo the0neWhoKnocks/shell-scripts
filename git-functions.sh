@@ -381,7 +381,7 @@ alias gut='git-untrack'
 ##
 # View all files staged to be committed
 function git-view-staged () {
-  git diff --name-only --cached
+  git status -uno
 }
 alias gvs='git-view-staged'
 
@@ -536,6 +536,14 @@ function git-brag () {
   fi
 }
 alias gb='git-brag'
+
+##
+# Adds all modified tracked files, including deleted files.
+# If you have new files you'll have to add them separately.
+function git-add-modified () {
+  git add -u
+}
+alias gam='git-add-modified'
 
 ##
 # Removes an added file/folder from staged files
