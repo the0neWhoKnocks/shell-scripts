@@ -565,3 +565,14 @@ function git-undo-add () {
   fi
 }
 alias gua='git-undo-add'
+
+##
+# Resets back to where you were before the last commit, keeps what was added.
+function git-undo-commit () {
+  echo;
+  echo -e " ${BCya}[RESETTING]${RCol} last commit"
+  echo;
+  
+  git reset --soft HEAD~1
+}
+alias guc='git-undo-commit'
