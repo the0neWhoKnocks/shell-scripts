@@ -576,3 +576,24 @@ function git-undo-commit () {
   git reset --soft HEAD~1
 }
 alias guc='git-undo-commit'
+
+##
+# Allows for restoring a previously deleted & committed file.
+function git-restore-file () {
+  if [[ "$1" != "" ]]; then
+    echo;
+    echo -e " ${BCya}[RESTORING]${RCol} ${BYel}$1${RCol}"
+    echo;
+    
+    git checkout $(git rev-list -n 1 HEAD -- "$1")~1 -- "$1"
+    
+  else
+    echo;
+    echo "usage: git-restore-file <full-path-to-file>"
+    echo "       grf <full-path-to-file>"
+    echo;
+    echo "example: grf \"some/path to/a/file.js\""
+    echo;
+  fi
+}
+alias grf='git-restore-file'
