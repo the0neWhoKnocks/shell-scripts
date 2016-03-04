@@ -329,15 +329,31 @@ alias gun='git-assume-unchanged'
 
 ##
 # A shorthand function to create patches of changes in your current branch
+# Allows for creation of a patch of recent commits
+# Optional args[2] allows user to specify number of commits to include in patch (default is 1)
 function git-patch () {
   if [[ "$1" != "" ]]; then
-    git diff > "$1.patch"
+    difference=$(git diff)
+    if [[ "$difference" != "" ]]; then
+      git diff > "$1.patch"
+    else
+      if [[ "$2" == "" ]]; then
+        count="1"
+        commits="commit"
+      else
+        count="$2"
+        commits="$2 commits"
+      fi
+      echo "creating a patch file $1.patch for changes in last $commits"
+      git diff "HEAD~$count" > "$1.patch"
+    fi
   else
     echo;
-    echo "usage: git-patch <patch-name>  OR  gp <patch-name>"
+    echo "usage: git-patch <patch-name>  OR  gp <patch-name> [number of commits to include]"
     echo;
     echo "example: gp my-name"
     echo "example: gp \"../Some folder/my-name\""
+    echo "example: gp my-name 3"
   fi
 }
 alias gp='git-patch'
