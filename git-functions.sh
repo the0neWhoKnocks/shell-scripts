@@ -578,7 +578,7 @@ function git-undo-commit () {
 alias guc='git-undo-commit'
 
 ##
-# Resets back to where you were before the last commit, keeps what was added.
+# Allows for restoring a previously deleted & committed file.
 function git-restore-file () {
   if [[ "$1" != "" ]]; then
     echo;
