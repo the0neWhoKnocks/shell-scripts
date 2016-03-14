@@ -178,7 +178,7 @@ function git-add-branch () {
     
     echo;
     echo -e " ${BCya}[ADDING]${RCol} ${BYel}$branchName${RCol} to your remote origin"
-    git push -u origin $branchName
+    git push --no-verify -u origin $branchName
     
     echo;
     echo -e " ${BCya}[SETTING]${RCol} the remote for ${BYel}$branchName${RCol} to origin"
