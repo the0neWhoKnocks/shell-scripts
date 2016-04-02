@@ -330,14 +330,66 @@ alias gun='git-assume-unchanged'
 ##
 # A shorthand function to create patches of changes in your current branch
 function git-patch () {
-  if [[ "$1" != "" ]]; then
-    git diff > "$1.patch"
+  function manual () {
+    echo;
+    echo "Usage: git-patch <patch-name> [options] [arguments]"
+    echo "       gp <patch-name> [options] [arguments]"
+    echo "       gp patch_name"
+    echo "       gp \"../Some folder/patch_name\""
+    echo "       gp patch_name -c 2"
+    echo;
+    echo "Options:"
+    echo "-h, --help                  Displays the manual"
+    echo "-c, --commit-count <count>  Create a patch from a number of previous commits"
+    echo;
+    return 0;
+  }
+  
+  while [[ "$*" ]]; do
+    case $1 in
+      "-c"|"--commit-count")
+        local commitCount="$2";
+        shift 2;
+      ;;
+      "-h"|"--help")
+        manual;
+        return 0;
+      ;;
+      *)
+        local fileName="$1";
+        shift 1;
+      ;;
+    esac
+  done
+  
+  # Throw error if no file name passed.
+  if [ -z ${fileName+x} ]; then
+    echo;
+    echo -e " ${BRed}[ERROR]${RCol} Patch name required";
+    return manual;
   else
+    local patchName="$fileName.patch"
+  fi
+  
+  # If no commit number set, check if there are un-staged changes and patch those.
+  if [ -z ${commitCount+x} ]; then
+    local diff=$(git diff);
+    
+    if [[ "$diff" != "" ]]; then
+      git diff --no-color > "$patchName"
+      echo;
+      echo -e " ${BCya}[CREATED]${RCol} $patchName"
+    else
+      echo;
+      echo -e " ${BRed}[ERROR]${RCol} No un-staged changes found, and \`--commit-count\` not specified";
+      return 1;
+    fi
+  else
+    [[ "$commitCount" == "1" ]] && s="" || s="s"
+    
+    git format-patch HEAD~$commitCount --no-stat --stdout > "$patchName"
     echo;
-    echo "usage: git-patch <patch-name>  OR  gp <patch-name>"
-    echo;
-    echo "example: gp my-name"
-    echo "example: gp \"../Some folder/my-name\""
+    echo -e " ${BCya}[CREATED]${RCol} $patchName from $commitCount commit$s"
   fi
 }
 alias gp='git-patch'

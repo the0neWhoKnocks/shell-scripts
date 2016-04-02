@@ -23,3 +23,14 @@ In your global `.gitconfig` file, set the editor entry so it matches what's belo
 	...
 	editor = ~/sh/git-editor.sh
 ```
+
+## What These Files Do
+
+**git-functions.sh**
+
+- A collection of shorthand functions/alias' that make working with GIT a little
+easier.
+- One thing that sets these functions apart from others is that it maintains
+hierarchy knowledge. By that I mean, if you cut a branch called `child` from
+`parent`, `child` knows to rebase from `parent` rather than pulling; and in turn,
+`parent` knows to pull rather than rebase since it doesn't have a parent.
