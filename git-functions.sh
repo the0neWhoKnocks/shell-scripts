@@ -10,6 +10,8 @@
 #                                                                    #
 ######################################################################
 
+source $(dirname $0)/colors.sh
+
 ##
 # This is the branch that serves as the default root branch
 # usually this'd be 'master', but in some projects it may be
@@ -17,24 +19,6 @@
 # delete a branch you're currently in. You will be moved to 
 # this branch, allowing the previous branch to be deleted.
 gitProjectRoot="master"
-
-
-# Text Reset
-EscChar=$(printf '\033')
-EscChar="${EscChar}["
-RCol="${EscChar}0m"
-BoldCol="${EscChar}1m"
-
-# Regular                Bold                        Background                 Bold Backgrounds
-Bla="${EscChar}30m";     BBla="${BoldCol}${Bla}";    On_Bla="${EscChar}40m";    On_IBla="${EscChar}100m";
-Red="${EscChar}31m";     BRed="${BoldCol}${Red}";    On_Red="${EscChar}41m";    On_IRed="${EscChar}101m";
-Gre="${EscChar}32m";     BGre="${BoldCol}${Gre}";    On_Gre="${EscChar}42m";    On_IGre="${EscChar}102m";
-Yel="${EscChar}33m";     BYel="${BoldCol}${Yel}";    On_Yel="${EscChar}43m";    On_IYel="${EscChar}103m";
-Blu="${EscChar}34m";     BBlu="${BoldCol}${Blu}";    On_Blu="${EscChar}44m";    On_IBlu="${EscChar}104m";
-Pur="${EscChar}35m";     BPur="${BoldCol}${Pur}";    On_Pur="${EscChar}45m";    On_IPur="${EscChar}105m";
-Cya="${EscChar}36m";     BCya="${BoldCol}${Cya}";    On_Cya="${EscChar}46m";    On_ICya="${EscChar}106m";
-Whi="${EscChar}37m";     BWhi="${BoldCol}${Whi}";    On_Whi="${EscChar}47m";    On_IWhi="${EscChar}107m";
-
 
 ##
 # Updates current git branch
