@@ -8,7 +8,9 @@
 #                                                                    #
 # source ~/sh/colors.sh                                              #
 #                                                                    #
-# Usage:                                                             #
+#                                                                    #
+# [ Usage ]                                                          #
+#                                                                    #
 # echo -e "${BCya}Cyan Message${RCol} white text"                    #
 #                                                                    #
 ######################################################################
