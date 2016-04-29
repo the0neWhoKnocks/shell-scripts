@@ -95,3 +95,11 @@ function startDocker () {
     dockerInstallDefaultContainer;
   fi
 }
+
+##
+# Stops the `default` Docker container
+function stopDocker () {
+  docker-machine stop default;
+  echo;
+  echo -e " ${BGre}✓${RCol} Default Docker has stopped.";
+}
