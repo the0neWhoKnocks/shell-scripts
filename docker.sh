@@ -86,7 +86,7 @@ function startDocker () {
       echo -e " ${BGre}✓${RCol} Default Docker is running.";
       dockerSetEnvVars;
     else
-      echo -e " ${BYel}❗${RCol} Default Docker is not running.";
+      echo -e " ${BYel}!${RCol} Default Docker is not running.";
       dockerStartDefaultContainer;
     fi
   else
