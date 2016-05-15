@@ -76,7 +76,7 @@ function startDocker () {
   local isRunning=$(docker-machine ls -q --filter name=default --filter state=running);
   
   # check if `default` docker-machine exists and is up and running
-  if [[ "$defaultContainer" != "" ]]; then
+  if [[ "$defaultContainer" != "" && "$isRunning" != "machine does not exist" ]]; then
     echo;
     echo -e " ${BGre}✓${RCol} Default Docker is defined.";
     
