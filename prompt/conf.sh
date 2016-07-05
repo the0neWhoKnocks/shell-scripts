@@ -14,3 +14,7 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 # Pretty    Obvious.  Right?
 setopt HIST_REDUCE_BLANKS
+
+# https://cygwin.com/cygwin-ug-net/using-cygwinenv.html
+# each option is separated by a space
+export CYGWIN="nodosfilewarning winsymlinks:nativestrict"
