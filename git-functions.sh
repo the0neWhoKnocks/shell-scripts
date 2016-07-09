@@ -633,3 +633,16 @@ function git-restore-file () {
   fi
 }
 alias grf='git-restore-file'
+
+##
+# Resets any file permission changes that were made.
+function git-reset-perms () {
+  echo;
+  echo -e " ${BCya}[RESETTING]${RCol} file permissions"
+  echo;
+  
+  git diff -p -R --no-color \
+    | grep -E "^(diff|(old|new) mode)" --color=never \
+    | git apply -v
+}
+alias grp='git-reset-perms'
