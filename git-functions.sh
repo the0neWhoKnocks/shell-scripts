@@ -385,9 +385,9 @@ function git-rename-branch () {
     # Rename branch locally
     git branch -m "$1" "$2"
     # Delete the old branch
-    git push origin :"$1"
+    git push --no-verify origin :"$1"
     # Push the new branch, set local branch to track the new remote
-    git push --set-upstream origin "$2"
+    git push --no-verify --set-upstream origin "$2"
   else
     echo;
     echo "usage: git-rename-branch <old-branch-name> <new-branch-name>"
