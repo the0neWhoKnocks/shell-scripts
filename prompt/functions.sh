@@ -56,4 +56,4 @@ function col-palette {
 # == SET alias' =================================================
 alias gen-ssh='ssh-keygen -t rsa -C'
 alias get-ssh='clip < ~/.ssh/id_rsa.pub'
-alias open='explorer .'
+alias open='explorer'
