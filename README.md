@@ -3,6 +3,19 @@
 I keep my shell scripts within a `sh` directory within my user's home directory.
 
 
+**backup.sh**
+
+I use this on my work (OSX) system. It allows me to create backup archives of
+specific files or folders.
+In your `.*rc` file (`.zshrc`, `.bashrc`, etc), create an alias:
+```sh
+alias backupuserdata="$HOME/sh/backup.sh .atom .bash_history .bash_sessions .gitconfig .history .npmrc .oh-my-zsh .sh_history .ssh .tmux.conf .viminfo .vimrc .vscode .yarnrc .zsh-update .zsh_history .zshrc sh 'Library/Application Support/Google/Chrome/Default'"
+```
+In order to extract the password protected file:
+```sh
+7z x $HOME/Desktop/<FILE_NAME>.zip -o$HOME/Desktop/temp
+```
+
 **git-functions.sh**
 
 In your `.*rc` file (`.zshrc`, `.bashrc`, etc), add this line near the top of 
