@@ -13,7 +13,7 @@
 setopt extended_glob
 
 # show GIT branch if inside GIT repo
-source /etc/bash_completion.d/git
+source ~/sh/git-completion.zsh
 source ~/sh/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
 
@@ -56,9 +56,9 @@ $CHAR_rightVertBarBranch$CHAR_horzBar $SWITCH_TO_NORM_CHARS$COL_yellow"
   local pwdsize=${#${(%):-}}
   
   if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
-      ((PR_PWDLEN=$TERMWIDTH - $promptsize))
+    ((PR_PWDLEN=$TERMWIDTH - $promptsize))
   else
-   PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${CHAR_horzBar}.)}"
+    PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${CHAR_horzBar}.)}"
   fi
 
 
@@ -117,7 +117,8 @@ function setprompt () {
   CHAR_upperRightCorner=${altchar[j]:--}
   CHAR_leftVertBarBranch=${altchar[u]:--}
   CHAR_rightVertBarBranch=${altchar[t]:--}
-  CHAR_diamond=${altchar[\`]:--}
+  # CHAR_diamond=${altchar[\`]:--}
+  CHAR_diamond=${altchar[0]:--}
   charMap=${altchar[@]:--}
   extendedChars=$(echo -e $SWITCH_TO_EXT_CHARS$charMap; echo -e $SWITCH_TO_NORM_CHARS\n$charMap)
 
