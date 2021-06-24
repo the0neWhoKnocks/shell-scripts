@@ -25,8 +25,26 @@ gitProjectRoot="master"
 function git-update () {
   local currBranch=$(git rev-parse --abbrev-ref HEAD)
   local parentBranch=$(git config "branch.$currBranch.parent")
-  thereAreChanges=$(echo -ne $(git diff --exit-code))
+  local thereAreChanges=$(echo -ne $(git diff --exit-code))
+  local force=""
+  local remainingArgs=()
+  
+  while [[ $# -gt 0 ]]; do
+    arg="$1"
 
+    case $arg in
+      -f|--force)
+        force="$1"
+        shift # past argument
+        ;;
+      *) # unknown option
+        remainingArgs+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+    esac
+  done
+  set -- "${remainingArgs[@]}" # restore positional parameters
+  
   if [[ "$thereAreChanges" != "" ]]; then
     echo;
     echo -e " ${BCya}[STASH]${RCol} changes"
@@ -37,19 +55,19 @@ function git-update () {
     echo;
     echo -e " ${BCya}[REBASING]${RCol} from \"$1\" to \"$2\""
     echo;
-    git pull --rebase $1 $2
+    git pull $force --rebase $1 $2
   else
     # only try to rebase if there's a parent branch
     if [[ "$parentBranch" != "" ]]; then
       echo;
       echo -e " ${BCya}[REBASING]${RCol} from parent \"$parentBranch\""
       echo;
-      git pull --rebase origin "$parentBranch"
+      git pull $force --rebase origin "$parentBranch"
     else
       echo;
       echo -e " ${BCya}[PULLING]${RCol} new changes"
       echo;
-      git pull
+      git pull $force
     fi
   fi
 
