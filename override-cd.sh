@@ -7,8 +7,10 @@ function cd {
     fi
   }
   
-  log "Called with: '$@'"
-  builtin cd "$@" # perform the actual cd
+  if [[ "$1" != "--init" ]]; then
+    log "Called with: '$@'"
+    builtin cd "$@" # perform the actual cd
+  fi
   
   log "Current directory: '$PWD'"
   inApps=false
@@ -48,3 +50,6 @@ function cd {
     fi
   fi
 }
+
+# Run when initially loading the shell to ensure check is run if shell started in repo root
+cd --init
