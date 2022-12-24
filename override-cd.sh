@@ -1,7 +1,7 @@
 #!/bin/bash
 
-function cd () {
-  function log () {
+function cd {
+  function log {
     if [ -n "$DEBUG_CD" ]; then
       echo "[cd] $1"
     fi
