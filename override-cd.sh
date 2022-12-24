@@ -7,6 +7,22 @@ function cd {
     fi
   }
   
+  function teardown {
+    log "Not in required dir"
+    
+    if [ -n "$REPO_FUNCS" ]; then
+      echo "╭─────────"
+      for currFunc in "$REPO_FUNCS[@]"; do
+        unset -f $currFunc
+        echo "│[REMOVED] Function: '${currFunc}'"
+      done
+      echo "╰─────────"
+      
+      unset REPO_FUNCS
+      log "Clean-up for repo complete"
+    fi
+  }
+  
   if [[ "$1" != "--init" ]]; then
     log "Called with: '$@'"
     builtin cd "$@" # perform the actual cd
@@ -33,21 +49,11 @@ function cd {
       echo "╰───────"
       
       log "  Done"
+    else
+      teardown
     fi
   else
-    log "Not in required dir"
-    
-    if [ -n "$REPO_FUNCS" ]; then
-      echo "╭─────────"
-      for currFunc in "$REPO_FUNCS[@]"; do
-        unset -f $currFunc
-        echo "│[REMOVED] Function: '${currFunc}'"
-      done
-      echo "╰─────────"
-      
-      unset REPO_FUNCS
-      log "Clean-up for repo complete"
-    fi
+    teardown
   fi
 }
 
