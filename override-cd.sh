@@ -29,16 +29,42 @@ function cd {
   fi
   
   log "Current directory: '$PWD'"
-  inApps=false
+  local inApps=false
   case "$PWD" in
     *"Projects/Code/Apps/"*) inApps=true ;;
     *) ;;
   esac
   
+  if [ -d "./.git" ]; then
+    log "In git repo"
+    
+    local currBranch=$(git rev-parse --abbrev-ref HEAD)
+    # NOTE: `remote update` is a slow operation, so entering a repo will seem laggy.
+    local result=$( echo $(git remote update; git status -uno) | grep "branch is behind" )
+    
+    if [[ "$result" != "" ]]; then
+      echo "╭───────"
+      echo "│[WARNING] Local repo out of sync with Upstream repo."
+      echo "╰───────"
+      
+      while true; do
+        read "yn?Update Local repo (y/n)?: "
+        case $yn in
+          [Yy]* )
+            git pull --rebase origin "${currBranch}"
+            break
+            ;;
+          [Nn]* ) break;;
+          * ) echo "Please answer yes or no.";;
+        esac
+      done
+    fi
+  fi
+  
   if [ "$inApps" = true ]; then
     log "In required dir"
     
-    repoFile="${PWD}/bin/repo-funcs.sh"
+    local repoFile="${PWD}/bin/repo-funcs.sh"
     if [ -d ".git" ] && [ -f "${repoFile}" ]; then
       log "  Sourcing: ${repoFile}"
       source "${repoFile}"
