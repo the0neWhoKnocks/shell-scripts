@@ -28,6 +28,11 @@ function cd {
     builtin cd "$@" # perform the actual cd
   fi
   
+  # skip the extra overhead when running within a subshell
+  if [[ $ZSH_SUBSHELL -eq 1 ]] || [[ $BASH_SUBSHELL -eq 1 ]]; then
+    return 0;
+  fi
+  
   log "Current directory: '$PWD'"
   local inApps=false
   case "$PWD" in
