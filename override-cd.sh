@@ -45,9 +45,12 @@ function cd {
     
     local currBranch=$(git rev-parse --abbrev-ref HEAD)
     # NOTE: `remote update` is a slow operation, so entering a repo will seem laggy.
-    local result=$( echo $(git remote update; git status -uno) | grep "branch is behind" )
+    local updateStatus=$(git remote update; git status -uno)
     
-    if [[ "$result" != "" ]]; then
+    if \
+      echo "$updateStatus" | grep -q "branch is behind" \
+      || echo "$updateStatus" | grep -q "have diverged" \
+    ; then
       echo "╭───────"
       echo "│[WARNING] Local repo out of sync with Upstream repo."
       echo "╰───────"
@@ -56,7 +59,20 @@ function cd {
         read "yn?Update Local repo (y/n)?: "
         case $yn in
           [Yy]* )
+            local thereAreChanges=$(echo -ne $(git diff --exit-code))
+            if [[ "$thereAreChanges" != "" ]]; then
+              echo;
+              echo "[STASH] changes"
+              git stash
+            fi
+            
             git pull --rebase origin "${currBranch}"
+            
+            if [[ "$thereAreChanges" != "" ]]; then
+              echo;
+              echo "[UN-STASH] changes"
+              git stash apply
+            fi
             break
             ;;
           [Nn]* ) break;;
