@@ -45,7 +45,8 @@ function cd {
     
     local currBranch=$(git rev-parse --abbrev-ref HEAD)
     # NOTE: `remote update` is a slow operation, so entering a repo will seem laggy.
-    local updateStatus=$(git remote update; git status -uno)
+    git remote update &> /dev/null
+    local updateStatus=$(git status -uno)
     
     if \
       echo "$updateStatus" | grep -q "branch is behind" \
