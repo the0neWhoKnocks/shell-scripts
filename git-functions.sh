@@ -10,7 +10,8 @@
 #                                                                    #
 ######################################################################
 
-source $(dirname $0)/colors.sh
+[[ "$BASH_SOURCE" == "" ]] && sPath="$0" || sPath="$BASH_SOURCE"
+source $(dirname "$sPath")/colors.sh
 
 ##
 # This is the branch that serves as the default root branch
