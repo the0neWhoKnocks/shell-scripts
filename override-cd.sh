@@ -56,7 +56,12 @@ function cd {
       echo "│[WARNING] Local repo out of sync with Upstream repo."
       echo "╰───────"
       
-      read -p "Update Local repo (y/n)?: " yn
+      if echo "$SHELL" | grep -q "/zsh"; then
+        read "yn?Update Local repo (y/n)?: "
+      else
+        read -p "Update Local repo (y/n)?: " yn
+      fi
+      
       case $yn in
         [Yy]* )
           local thereAreChanges=$(echo -ne $(git diff --exit-code))
