@@ -55,30 +55,27 @@ function cd {
       echo "│[WARNING] Local repo out of sync with Upstream repo."
       echo "╰───────"
       
-      while true; do
-        read "yn?Update Local repo (y/n)?: "
-        case $yn in
-          [Yy]* )
-            local thereAreChanges=$(echo -ne $(git diff --exit-code))
-            if [[ "$thereAreChanges" != "" ]]; then
-              echo;
-              echo "[STASH] changes"
-              git stash
-            fi
-            
-            git pull --rebase origin "${currBranch}"
-            
-            if [[ "$thereAreChanges" != "" ]]; then
-              echo;
-              echo "[UN-STASH] changes"
-              git stash apply
-            fi
-            break
-            ;;
-          [Nn]* ) break;;
-          * ) echo "Please answer yes or no.";;
-        esac
-      done
+      read -p "Update Local repo (y/n)?: " yn
+      case $yn in
+        [Yy]* )
+          local thereAreChanges=$(echo -ne $(git diff --exit-code))
+          if [[ "$thereAreChanges" != "" ]]; then
+            echo;
+            echo "[STASH] changes"
+            git stash
+          fi
+          
+          git pull --rebase origin "${currBranch}"
+          
+          if [[ "$thereAreChanges" != "" ]]; then
+            echo;
+            echo "[UN-STASH] changes"
+            git stash apply
+          fi
+          ;;
+        [Nn]* ) ;;
+        * ) echo "Please answer yes or no.";;
+      esac
     fi
   fi
   
