@@ -43,45 +43,48 @@ function cd {
   if [ -d "./.git" ]; then
     log "In git repo"
     
-    local currBranch=$(git rev-parse --abbrev-ref HEAD)
-    # NOTE: `remote update` is a slow operation, so entering a repo will seem laggy.
-    git remote update &> /dev/null
-    local updateStatus=$(git status -uno)
-    
-    if \
-      echo "$updateStatus" | grep -q "branch is behind" \
-      || echo "$updateStatus" | grep -q "have diverged" \
-    ; then
-      echo "╭───────"
-      echo "│[WARNING] Local repo out of sync with Upstream repo."
-      echo "╰───────"
+    local currBranch=$(git rev-parse -q --verify --abbrev-ref HEAD)
+    # Account for cases where a repo was initialized but has no commits.
+    if [[ "$currBranch" != "" ]]; then
+      # NOTE: `remote update` is a slow operation, so entering a repo will seem laggy.
+      git remote update &> /dev/null
+      local updateStatus=$(git status -uno)
       
-      if echo "$SHELL" | grep -q "/zsh"; then
-        read "yn?Update Local repo (y/n)?: "
-      else
-        read -p "Update Local repo (y/n)?: " yn
+      if \
+        echo "$updateStatus" | grep -q "branch is behind" \
+        || echo "$updateStatus" | grep -q "have diverged" \
+      ; then
+        echo "╭───────"
+        echo "│[WARNING] Local repo out of sync with Upstream repo."
+        echo "╰───────"
+        
+        if echo "$SHELL" | grep -q "/zsh"; then
+          read "yn?Update Local repo (y/n)?: "
+        else
+          read -p "Update Local repo (y/n)?: " yn
+        fi
+        
+        case $yn in
+          [Yy]* )
+            local thereAreChanges=$(echo -ne $(git diff --exit-code))
+            if [[ "$thereAreChanges" != "" ]]; then
+              echo;
+              echo "[STASH] changes"
+              git stash
+            fi
+            
+            git pull --rebase origin "${currBranch}"
+            
+            if [[ "$thereAreChanges" != "" ]]; then
+              echo;
+              echo "[UN-STASH] changes"
+              git stash apply
+            fi
+            ;;
+          [Nn]* ) ;;
+          * ) echo "Please answer yes or no.";;
+        esac
       fi
-      
-      case $yn in
-        [Yy]* )
-          local thereAreChanges=$(echo -ne $(git diff --exit-code))
-          if [[ "$thereAreChanges" != "" ]]; then
-            echo;
-            echo "[STASH] changes"
-            git stash
-          fi
-          
-          git pull --rebase origin "${currBranch}"
-          
-          if [[ "$thereAreChanges" != "" ]]; then
-            echo;
-            echo "[UN-STASH] changes"
-            git stash apply
-          fi
-          ;;
-        [Nn]* ) ;;
-        * ) echo "Please answer yes or no.";;
-      esac
     fi
   fi
   
