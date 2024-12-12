@@ -14,6 +14,7 @@ function cd {
       echo "╭─────────"
       for currFunc in "$REPO_FUNCS[@]"; do
         unset -f $currFunc
+        unset -f "orig_$currFunc"
         echo "│[REMOVED] Function: '${currFunc}'"
       done
       echo "╰─────────"
@@ -22,6 +23,48 @@ function cd {
       log "Clean-up for repo complete"
     fi
   }
+  
+  function loadRepoFile {
+    local label="ADDED"
+    if [[ "$1" == "update" ]]; then
+      label="UPDATED"
+    fi
+    
+    source "${repoFile}"
+    echo "╭───────"
+    for currFunc in "$REPO_FUNCS[@]"; do
+      echo "│[${label}] Function: '${currFunc}'"
+      
+      # rename function so it can be wrapped
+      eval orig_"$(declare -f ${currFunc})"
+      # wrap function
+      eval "function ${currFunc} { verifyRepoFuncsCurrent \"${currFunc}\"; orig_${currFunc} }"
+    done
+    echo "╰───────"
+  }
+  
+  function verifyRepoFuncsCurrent {
+    log "Verify repo file: ${repoFile}"
+    
+    local currSHA=$(genRepoFileSHA)
+    log "        Repo file SHA: ${repoFileSHA}"
+    log "Current repo file SHA: ${currSHA}"
+    
+    if [[ "$repoFileSHA" != "$currSHA" ]]; then
+      echo;
+      echo "Repo file not current, updating functions ..."
+      repoFileSHA=$currSHA
+      loadRepoFile 'update'
+    fi
+  }
+  
+  function genRepoFileSHA {
+    # `printf` reads the spaces in the return as arguments and only prints
+    # the first argument (the SHA). The `echo` is to ditch the `%` from `printf`.
+    local sha=$(printf $(sha256sum "$repoFile"); echo)
+    echo "$sha"
+  }
+  
   
   if [[ "$1" != "--init" ]]; then
     log "Called with: '$@'"
@@ -91,15 +134,13 @@ function cd {
   if [ "$inApps" = true ]; then
     log "In required dir"
     
-    local repoFile="${PWD}/bin/repo-funcs.sh"
+    # NOTE: `repoFile` & `repoFileSHA` can't be `local` since `verifyRepoFuncsCurrent` will be called from external scripts
+    repoFile="${PWD}/bin/repo-funcs.sh"
     if [ -d ".git" ] && [ -f "${repoFile}" ]; then
+      repoFileSHA=$(genRepoFileSHA)
+      log "  Repo file SHA: ${repoFileSHA}"
       log "  Sourcing: ${repoFile}"
-      source "${repoFile}"
-      echo "╭───────"
-      for currFunc in "$REPO_FUNCS[@]"; do
-        echo "│[ADDED] Function: '${currFunc}'"
-      done
-      echo "╰───────"
+      loadRepoFile
       
       log "  Done"
     else
