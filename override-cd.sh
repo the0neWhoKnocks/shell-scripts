@@ -77,11 +77,6 @@ function cd {
   fi
   
   log "Current directory: '$PWD'"
-  local inApps=false
-  case "$PWD" in
-    *"Projects/Code/Apps/"*) inApps=true ;;
-    *) ;;
-  esac
   
   if [ -d "./.git" ]; then
     log "In git repo"
@@ -131,21 +126,17 @@ function cd {
     fi
   fi
   
-  if [ "$inApps" = true ]; then
+  repoFile="${PWD}/bin/repo-funcs.sh"
+  if [ -d "./.git" ] && [ -f "${repoFile}" ]; then
     log "In required dir"
     
     # NOTE: `repoFile` & `repoFileSHA` can't be `local` since `verifyRepoFuncsCurrent` will be called from external scripts
-    repoFile="${PWD}/bin/repo-funcs.sh"
-    if [ -d ".git" ] && [ -f "${repoFile}" ]; then
-      repoFileSHA=$(genRepoFileSHA)
-      log "  Repo file SHA: ${repoFileSHA}"
-      log "  Sourcing: ${repoFile}"
-      loadRepoFile
-      
-      log "  Done"
-    else
-      teardown
-    fi
+    repoFileSHA=$(genRepoFileSHA)
+    log "  Repo file SHA: ${repoFileSHA}"
+    log "  Sourcing: ${repoFile}"
+    loadRepoFile
+    
+    log "  Done"
   else
     teardown
   fi
