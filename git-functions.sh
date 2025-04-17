@@ -14,14 +14,6 @@
 source $(dirname "$sPath")/colors.sh
 
 ##
-# This is the branch that serves as the default root branch
-# usually this'd be 'master', but in some projects it may be
-# different. It's primarily used in the case where you try to
-# delete a branch you're currently in. You will be moved to
-# this branch, allowing the previous branch to be deleted.
-gitProjectRoot="master"
-
-##
 # Updates current git branch
 function git-update () {
   local currBranch=$(git rev-parse --abbrev-ref HEAD)
@@ -208,9 +200,13 @@ function git-delete-branch () {
 
     # if there isn't a parent branch, use the root branch
     if [[ "$parentBranch" == "" ]]; then
-      echo;
-      echo -e " ${BCya}[SETTING]${RCol} parentBranch to ${BYel}$gitProjectRoot${RCol}"
-      parentBranch=$gitProjectRoot
+      parentBranch=$(git remote show origin &> /dev/null | sed -n '/HEAD branch/s/.*: //p')
+      
+      # User could have lost internet connection or purposefully working offline.
+      if [[ "$parentBranch" != "" ]]; then
+        echo;
+        echo -e " ${BCya}[SETTING]${RCol} parentBranch to ${BYel}$parentBranch${RCol}"
+      fi
     fi
 
     # if there are changes stash them
@@ -220,8 +216,9 @@ function git-delete-branch () {
       git stash
     fi
 
+    # try to switch to the parent branch
     if [[ "$currBranch" == "$1" ]]; then
-      # check if the branch exists before switching
+      # check if the branch exists before switching (may be blank if no internet connection present)
       git show-ref --verify --quiet refs/heads/$parentBranch
       if [[ "$?" == "1" ]]; then
         echo;
