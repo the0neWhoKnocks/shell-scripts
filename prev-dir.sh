@@ -18,14 +18,13 @@ if [ -t 0 ]; then
     # only prompt to load previous dir if one has been saved, and a new shell was started
     if [[ "${CUSTOM__PREV_DIR}" != "" ]] && [[ "${PWD}" == "${HOME}" ]]; then  
       while true; do
-        read "yn?Load '${CUSTOM__PREV_DIR}' (y/n)?: "
+        read "yn?Load '${CUSTOM__PREV_DIR}' (Y/n)?: "
         case $yn in
-          [Yy]* )
+          [Nn]* ) break;;
+          * )
             cd "${CUSTOM__PREV_DIR}"
             break
             ;;
-          [Nn]* ) break;;
-          * ) echo "Please answer yes or no.";;
         esac
       done
     fi
