@@ -65,6 +65,22 @@ function cd {
     echo "$sha"
   }
   
+  function spinner {
+    local _pid="$1"
+    local _msg="${2:-'Spinner Message'}"
+    local delay="0.1"
+    local i=0
+    local sChar='▖▘▝▗'
+    tput civis  # cursor invisible
+    while [ -d /proc/$_pid ]; do
+      i=$(( (i+1) %4 ))
+      printf "\r${sChar:$i:1} ${2} ${sChar:$i:1}"
+      sleep 0.1
+    done
+    tput cnorm  # cursor normal
+    tput dl1  # delete line
+    return 0
+  }
   
   if [[ "$1" != "--init" ]]; then
     log "Called with: '$@'"
@@ -84,8 +100,11 @@ function cd {
     local currBranch=$(git rev-parse -q --verify --abbrev-ref HEAD)
     # Account for cases where a repo was initialized but has no commits.
     if [[ "$currBranch" != "" ]]; then
+      set +m  # Disable monitor mode so that the spinner message doesn't display PID messages.
       # NOTE: `remote update` is a slow operation, so entering a repo will seem laggy.
-      git remote update &> /dev/null
+      git remote update & gruPID=$!
+      spinner $gruPID "Checking Repo Status"
+      set -m
       local updateStatus=$(git status -uno)
       
       if \
