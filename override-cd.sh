@@ -111,15 +111,18 @@ function cd {
         echo "$updateStatus" | grep -q "branch is behind" \
         || echo "$updateStatus" | grep -q "have diverged" \
       ; then
-        echo "╭───────"
-        echo "│[WARNING] Local repo out of sync with Upstream repo."
-        echo "╰───────"
+        tput setaf 3  # change to yellow
+        echo " ╭─────────╮"
+        echo " │ WARNING │ Local repo out of sync with Upstream repo."
+        echo " ╰─────────╯"
+        tput sgr0  # reset color
         
         if echo "$SHELL" | grep -q "/zsh"; then
-          read "yn?Update Local repo (y/n)?: "
+          read "yn?   Update Local repo (y/n)?: "
         else
-          read -p "Update Local repo (y/n)?: " yn
+          read -p "   Update Local repo (y/n)?: " yn
         fi
+        tput cuu 4; tput ed  # delete previous lines
         
         case $yn in
           [Yy]* )
