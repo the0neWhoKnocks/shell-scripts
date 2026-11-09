@@ -107,22 +107,33 @@ function cd {
       set -m
       local updateStatus=$(git status -uno)
       
+      local col_red=$(tput setaf 1)
+      local col_yellow=$(tput setaf 3)
+      local col_reset=$(tput sgr0)
+      
       if \
         echo "$updateStatus" | grep -q "branch is behind" \
         || echo "$updateStatus" | grep -q "have diverged" \
       ; then
-        tput setaf 3  # change to yellow
+        local branchStatus=""
+        if echo "$updateStatus" | grep -q "branch is behind"; then
+          branchStatus=" (remote has changes)"
+        elif echo "$updateStatus" | grep -q "have diverged"; then
+          branchStatus="${col_red} ([CAUTION] remote & local have changes)"
+        fi
+        
+        echo -n "$col_yellow"
         echo " ╭─────────╮"
         echo " │ WARNING │ Local repo out of sync with Upstream repo."
-        echo " ╰─────────╯"
-        tput sgr0  # reset color
+        echo " ╰─────────╯${branchStatus}${col_yellow}"
+        echo "$col_reset"
         
         if echo "$SHELL" | grep -q "/zsh"; then
           read "yn?   Update Local repo (y/n)?: "
         else
           read -p "   Update Local repo (y/n)?: " yn
         fi
-        tput cuu 4; tput ed  # delete previous lines
+        tput cuu 5; tput ed  # delete previous lines
         
         case $yn in
           [Yy]* )
